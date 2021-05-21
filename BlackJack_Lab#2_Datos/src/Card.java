@@ -18,6 +18,7 @@ public class Card {
         this.value = value;
     }
 
+    @Override
     public String toString() {
         return this.value.toString() + "-" + this.suit.toString();
     }

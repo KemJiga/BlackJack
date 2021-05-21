@@ -24,7 +24,6 @@ public class Visual extends javax.swing.JFrame {
     public volatile boolean HintBool = false;
     public volatile boolean StandBool = false;
     public String playerText = "Bienvenid@ a Blackjack!";
-    //public String dealerText = "Bienvenid@ a Blackjack!";
 
     public int playerBet;
     public int playerMoney;
@@ -32,23 +31,31 @@ public class Visual extends javax.swing.JFrame {
     public Visual() {
         initComponents();
         this.setSize(1096, 670);
+
         Fondo1.setSize(1096, 670);
         Fondo2.setSize(1096, 670);
-
         URL imageURL = getClass().getResource("/Cards/fondo_red.jpg");
         ImageIcon icon = new ImageIcon(imageURL);
         Fondo2.setIcon(icon);
         Fondo1.setIcon(icon);
-        Game.setVisible(false);
+
+        imageURL = getClass().getResource("/Cards/logo.png");
+        scaleImage(imageURL, Logo);
+
         Start.setSize(300, 70);
         Font font = new Font("Agency FB", Font.BOLD, 36);
         Start.setFont(font);
         Start.setText("Start");
+                
         int wB = this.getWidth() / 2 - Start.getWidth() / 2;
+        int wL = this.getWidth() / 3 - 35;
         Start.setLocation(wB, this.getHeight() / 3 * 2);
+        Logo.setLocation(wL, Logo.getY());
+
+        Game.setVisible(false);
     }
 
-    private void scaleImage(String source, javax.swing.JLabel label) {
+    private void scaleImage(URL source, javax.swing.JLabel label) {
         ImageIcon icon = new ImageIcon(source);
 
         Image img = icon.getImage();
@@ -141,6 +148,8 @@ public class Visual extends javax.swing.JFrame {
 
         Entrance = new javax.swing.JPanel();
         Start = new javax.swing.JButton();
+        Logo = new javax.swing.JLabel();
+        Author = new javax.swing.JLabel();
         Fondo1 = new javax.swing.JLabel();
         Game = new javax.swing.JPanel();
         Hint = new javax.swing.JButton();
@@ -182,8 +191,15 @@ public class Visual extends javax.swing.JFrame {
         });
         Entrance.add(Start);
         Start.setBounds(490, 440, 73, 23);
+        Entrance.add(Logo);
+        Logo.setBounds(290, 50, 400, 350);
 
-        Fondo1.setIcon(new javax.swing.ImageIcon("C:\\Users\\kemer\\Desktop\\Lab#2_Datos\\fondo_red.jpg")); // NOI18N
+        Author.setFont(new java.awt.Font("Agency FB", 1, 18)); // NOI18N
+        Author.setForeground(new java.awt.Color(255, 255, 255));
+        Author.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Author.setText("@Kemer");
+        Entrance.add(Author);
+        Author.setBounds(996, 600, 100, 30);
         Entrance.add(Fondo1);
         Fondo1.setBounds(0, 0, 1080, 670);
 
@@ -221,7 +237,7 @@ public class Visual extends javax.swing.JFrame {
             }
         });
         Game.add(Apostar);
-        Apostar.setBounds(840, 520, 71, 40);
+        Apostar.setBounds(840, 520, 67, 40);
         Game.add(PlayerCard1);
         PlayerCard1.setBounds(20, 90, 120, 230);
         Game.add(PlayerCard2);
@@ -296,8 +312,6 @@ public class Visual extends javax.swing.JFrame {
         });
         Game.add(jButton1);
         jButton1.setBounds(940, 520, 70, 40);
-
-        Fondo2.setIcon(new javax.swing.ImageIcon("C:\\Users\\kemer\\Desktop\\Lab#2_Datos\\fondo_red.jpg")); // NOI18N
         Game.add(Fondo2);
         Fondo2.setBounds(0, 0, 1100, 670);
 
@@ -323,24 +337,27 @@ public class Visual extends javax.swing.JFrame {
     Deck playerCards;
     Deck dealerCards;
     boolean endRound;
-
+    boolean roundStarts;
+    
+    //inicializa 3 mazos. El fuente con todas las cartas y dos vacios para el jugador y repartidor.
     private void inicialDecks() {
         playingDeck = new Deck();
         playingDeck.createFullDeck();
         playingDeck.shuffle();
 
-        //playerCards will be the cards the player has in their hand
+        //playerCards son las cartas que tiene el jugador en su mano
         playerCards = new Deck();
-        //playerMoney holds players cash - we will be lazy and use doubles instead of bigdecimals
+        //playerMoney es el dinero para apostar 
         playerMoney = 100;
         PlayerMoney.setText("$ " + playerMoney);
-        //dealerCards will be the cards the dealer has in their hand
+        //dealerCards son las cartas del repartidor o la mesa
         dealerCards = new Deck();
 
         playerText += "\nTienes $" + playerMoney + " ¿Cuanto apostaras?";
         endRound = false;
     }
-
+    
+    //Devuelve todas las cartas en juego al mazo original
     private void putBackCards() {
         playerCards.moveAllToDeck(playingDeck);
         dealerCards.moveAllToDeck(playingDeck);
@@ -349,50 +366,66 @@ public class Visual extends javax.swing.JFrame {
     private void StartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartActionPerformed
         Entrance.setVisible(false);
         Game.setVisible(true);
-        
+
         Apuesta.setText("");
-        
+
         PlayerMoney.setLocation(530, PlayerMoney.getY());
         Capital.setLocation(520, Capital.getY());
         Puntajes.setLocation(500, Puntajes.getY());
-
+        
+        //se actualizan las imagenes en las cartas del jugador y el repartidor
         drawCards(PlayerCard1);
         drawCards(PlayerCard2);
         drawCards(DealerCard1);
         drawCards(DealerCard2);
-        
+
         PlayerValue.setText("0");
         DealerValue.setText("0");
 
-        //abrir un JFrame con info basica del juego
+        //Una ventana con informacion sobre el juego
         playerText = "Bienvienid@ a BlackJack!";
         PlayerHistorial.setText(playerText);
         JOptionPane.showMessageDialog(this, playerText);
-        JOptionPane.showMessageDialog(this, "BlackJack es un juego de casino simple de cartas"
+        JOptionPane.showMessageDialog(this, "BlackJack es un juego de cartas de casino"
                 + "\n" + "Cada carta tienen un valor numerico y el objetivo es alcanar 21"
-                + "\n" + "Pierdes si pasas de 21 o alguien mas obtiene un valor mayor al tuyo"
-                + "\n" + "Diviertete!!");
+                + "\n" + "Pierdes si pasas de 21 o alguien mas obtiene un valor mayor al tuyo, pero menor a 21");
+        
+        //inicializa los mazos
         inicialDecks();
+        endRound = false;
+        roundStarts = true;
     }//GEN-LAST:event_StartActionPerformed
 
     private void HintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HintActionPerformed
-        if (playerBet != 0) {
+        //toma la apuesta del jugador para verificar si se esta en juego
+        int bet = 0;
+        try {
+            bet = Integer.parseInt(Apuesta.getText());
+        } catch (NumberFormatException e) {
+            //bet = 0;
+        }
+        
+        //toma una carta si la apuesta no es nula, se esta jugando una mano o no se ha acabado la ronda
+        if (bet != 0 && !PlayerValue.getText().equals("0") && !endRound) {
             playerCards.draw(playingDeck);
             playerText += "\n" + "Nueva carta:" + playerCards.getCard(playerCards.deckSize() - 1).toString();
+            JOptionPane.showMessageDialog(this, "Tomas una:\n" + playerCards.getCard(playerCards.deckSize() - 1).toString());
             playerText += "\n" + "Valor de la mano: " + playerCards.cardsValue();
             PlayerValue.setText("" + playerCards.cardsValue());
 
             PlayerHistorial.setText(playerText);
-            //Bust if they go over 21
+            //jugador pierde instantaneamente si supera 21
             if (playerCards.cardsValue() > 21) {
+                JOptionPane.showMessageDialog(this, "Superste los 21!");
                 playerText += "\n" + "oof! superaste los 21 con: " + playerCards.cardsValue() + "\n" + "Pierdes la apuesta";
                 putBackCards();
                 PlayerHistorial.setText(playerText);
                 playerMoney -= playerBet;
                 PlayerMoney.setText("$" + playerMoney);
+                endRound = true;
 
                 if (playerMoney <= 0) {
-                    int seleccion = JOptionPane.showOptionDialog(this, "Has Perdido!", "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+                    int seleccion = JOptionPane.showOptionDialog(this, "Has Perdido!", "Better Luck Next Time", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
                             new Object[]{"Try Again", "Quit"}, "Try Again");
                     if (seleccion != -1) {
                         if (seleccion == 0) {
@@ -407,7 +440,7 @@ public class Visual extends javax.swing.JFrame {
                             PlayerValue.setText("0");
                             DealerValue.setText("0");
                             putBackCards();
-                            
+
                             endRound = false;
                         } else if (seleccion == 1) {
                             System.exit(0);
@@ -415,27 +448,88 @@ public class Visual extends javax.swing.JFrame {
                     }
                 } else {
                     JOptionPane.showMessageDialog(this, "Tienes $" + playerMoney + "\nApuesta de nuevo!");
+                    endRound = true;
                 }
             }
-        }else{
+        } else if (bet == 0) {
             JOptionPane.showMessageDialog(this, "Realiza una apuesta!");
+        } else if (PlayerValue.getText().equals("0")) {
+            JOptionPane.showMessageDialog(this, "Comienza la mano!");
         }
+    }//GEN-LAST:event_HintActionPerformed
 
-        /*playerCards.draw(playingDeck);
-        playerText += "\n" + "Nueva carta:" + playerCards.getCard(playerCards.deckSize() - 1).toString();
-        playerText += "\n" + "Valor de la mano: " + playerCards.cardsValue();
+    private void StandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StandActionPerformed
+        int bet = Integer.parseInt(PlayerValue.getText());
 
-        PlayerHistorial.setText(playerText);
-        //Bust if they go over 21
-        if (playerCards.cardsValue() > 21) {
-            playerText += "\n" + "oof! superaste los 21 con: " + playerCards.cardsValue() + "\n" + "Pierdes la apuesta";
-            putBackCards();
+        if (!endRound && roundStarts == false) {
+            //Revela la carta oculta del repartidor
+            playerText += "\n" + "Cartas del Repartidor:" + dealerCards.toString();
             PlayerHistorial.setText(playerText);
-            playerMoney -= playerBet;
-            PlayerMoney.setText("$" + playerMoney);
+            drawCards(dealerCards.getCard(1).toString(), DealerCard2);
+            DealerValue.setText("" + dealerCards.cardsValue());
+            
+            //Comprueba si el repartidor supera al jugador
+            if ((dealerCards.cardsValue() > playerCards.cardsValue()) && endRound == false) {
+                playerText += "\n" + "El Repartidor vence: " + dealerCards.cardsValue() + " a " + playerCards.cardsValue();
+                PlayerHistorial.setText(playerText);
+                playerMoney -= playerBet;
+                PlayerMoney.setText("$" + playerMoney);
+                endRound = true;
+            }
+            //si el repartidor saca menos de 17, toma una
+            while ((dealerCards.cardsValue() < 17) && endRound == false) {
+                dealerCards.draw(playingDeck);
+                playerText += "\n" + "Repartidor toma una: " + dealerCards.getCard(dealerCards.deckSize() - 1).toString();
+                JOptionPane.showMessageDialog(this, "Repartidor toma una:\n" + dealerCards.getCard(dealerCards.deckSize() - 1).toString());
+                DealerValue.setText("" + dealerCards.cardsValue());
+                PlayerHistorial.setText(playerText);
+            }
+            
+            //Muestra el valor del repartidor
+            playerText += "\n" + "Mano del repartidor valuada: " + dealerCards.cardsValue();
+            PlayerHistorial.setText(playerText);
+            //Comprueba si el repartidor se pasó
+            if ((dealerCards.cardsValue() > 21) && endRound == false) {
+                playerText += "\n" + "El repartidor pierde. " + "\n" + "Ganas la Mano.";
+                PlayerHistorial.setText(playerText);
+                playerMoney += playerBet;
+                PlayerMoney.setText("$" + playerMoney);
+                endRound = true;
+            }
+            //Comprueba si es un empate
+            if ((dealerCards.cardsValue() == playerCards.cardsValue()) && endRound == false) {
+                playerText += "\n" + "Empate.";
+                PlayerHistorial.setText(playerText);
+                JOptionPane.showMessageDialog(this, "Empate");
+                endRound = true;
+            }
+            
+            //Comprueba si el jugador gana
+            if ((playerCards.cardsValue() > dealerCards.cardsValue()) && endRound == false) {
+                playerText += "\n" + "Ganas la Mano: " + playerCards.cardsValue() + " a " + dealerCards.cardsValue();
+                JOptionPane.showMessageDialog(this, "Ganas la Mano: " + playerCards.cardsValue() + " a " + dealerCards.cardsValue());
+                PlayerHistorial.setText(playerText);
+                playerMoney += playerBet;
+                PlayerMoney.setText("$" + playerMoney);
+                endRound = true;
+            } else if (endRound == false) //si gana el repartidor
+            {
+                playerText += "\n" + "Repartidor gana: " + dealerCards.cardsValue() + " a " + playerCards.cardsValue();
+                JOptionPane.showMessageDialog(this, "Pierdes: " + dealerCards.cardsValue() + " a " + playerCards.cardsValue());
+                PlayerHistorial.setText(playerText);
+                playerMoney -= playerBet;
+                PlayerMoney.setText("$" + playerMoney);
+            }
+
+            //Se regresan las cartas al mazo
+            putBackCards();
+            
+            playerText += "\n" + "Tienes: " + playerMoney;
+            PlayerHistorial.setText(playerText);
+            JOptionPane.showMessageDialog(this, "Acaba la mano\nTienes $" + playerMoney);
 
             if (playerMoney <= 0) {
-                int seleccion = JOptionPane.showOptionDialog(this, "Has Perdido!", "", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
+                int seleccion = JOptionPane.showOptionDialog(this, "Has Perdido!", "Better Luck Next Time", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
                         new Object[]{"Try Again", "Quit"}, "Try Again");
                 if (seleccion != -1) {
                     if (seleccion == 0) {
@@ -445,116 +539,37 @@ public class Visual extends javax.swing.JFrame {
                         drawCards(PlayerCard2);
                         drawCards(DealerCard1);
                         drawCards(DealerCard2);
+                        PlayerValue.setText("0");
+                        DealerValue.setText("0");
                         playerText = "Bienvenid@ a BlackJack!";
                         PlayerHistorial.setText(playerText);
-                        putBackCards();
+                        
                         endRound = false;
-                    } else if (seleccion == 1) {
+                    } else {
                         System.exit(0);
                     }
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Tienes $" + playerMoney + "\nApuesta de nuevo!");
+                playerText += "\n" + "Apuesta de nuevo!";
+                JOptionPane.showMessageDialog(this,"Apuesta de nuevo!");
+                PlayerHistorial.setText(playerText);
             }
-        }*/
-        //actualizar el valor visible de la mano
-    }//GEN-LAST:event_HintActionPerformed
-
-    private void StandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StandActionPerformed
-        endRound = false;
-
-        //Reveal Dealer Cards
-        playerText += "\n" + "Cartas del Repartidor:" + dealerCards.toString();
-        drawCards(dealerCards.getCard(1).toString(), DealerCard2);
-        DealerValue.setText("" + dealerCards.cardsValue());
-        
-        PlayerHistorial.setText(playerText);
-        //See if dealer has more points than player
-        if ((dealerCards.cardsValue() > playerCards.cardsValue()) && endRound == false) {
-            playerText += "\n" + "El Repartidor vence: " + dealerCards.cardsValue() + " a " + playerCards.cardsValue();
-            PlayerHistorial.setText(playerText);
-            playerMoney -= playerBet;
-            PlayerMoney.setText("$" + playerMoney);
-            endRound = true;
-        }
-        //Dealer hits at 16 stands at 17
-        while ((dealerCards.cardsValue() < 17) && endRound == false) {
-            dealerCards.draw(playingDeck);
-            playerText += "\n" + "Repartidor toma una: " + dealerCards.getCard(dealerCards.deckSize() - 1).toString();
-            DealerValue.setText("" + dealerCards.cardsValue());
-            PlayerHistorial.setText(playerText);
-        }
-        //Display value of dealer
-        playerText += "\n" + "Mano del repartidor valuada: " + dealerCards.cardsValue();
-        PlayerHistorial.setText(playerText);
-        //Determine if dealer busted
-        if ((dealerCards.cardsValue() > 21) && endRound == false) {
-            playerText += "\n" + "El repartidor pierde. " + "\n" + "Ganas la Mano.";
-            PlayerHistorial.setText(playerText);
-            playerMoney += playerBet;
-            PlayerMoney.setText("$" + playerMoney);
-            endRound = true;
-        }
-        //Determine if push
-        if ((dealerCards.cardsValue() == playerCards.cardsValue()) && endRound == false) {
-            playerText += "\n" + "Empate.";
-            PlayerHistorial.setText(playerText);
-            endRound = true;
-        }
-        //Determine if player wins
-        if ((playerCards.cardsValue() > dealerCards.cardsValue()) && endRound == false) {
-            playerText += "\n" + "Ganas la Mano: " + playerCards.cardsValue() + " a " + dealerCards.cardsValue();
-            PlayerHistorial.setText(playerText);
-            playerMoney += playerBet;
-            PlayerMoney.setText("$" + playerMoney);
-            endRound = true;
-        } else if (endRound == false) //dealer wins
-        {
-            playerText += "\n" + "Repartidor gana: " + dealerCards.cardsValue() + " a " + playerCards.cardsValue();
-            PlayerHistorial.setText(playerText);
-            playerMoney -= playerBet;
-            PlayerMoney.setText("$" + playerMoney);
-        }
-
-        //End of hand - put cards back in deck
-        putBackCards();
-        //playerText += "\n" + "End of Hand.";
-        playerText += "\n" + "Tienes: " + playerMoney;
-        PlayerHistorial.setText(playerText);
-        JOptionPane.showMessageDialog(this, "Acaba la mano\nTienes $" + playerMoney);
-
-        if (playerMoney <= 0) {
-            int seleccion = JOptionPane.showOptionDialog(this, "Has Perdido!", "Better Luck At Next", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE, null,
-                    new Object[]{"Try Again", "Quit"}, "Try Again");
-            if (seleccion != -1) {
-                if (seleccion == 0) {
-                    playerMoney = 100;
-                    PlayerMoney.setText("$" + playerMoney);
-                    drawCards(PlayerCard1);
-                    drawCards(PlayerCard2);
-                    drawCards(DealerCard1);
-                    drawCards(DealerCard2);
-                    PlayerValue.setText("0");
-                    DealerValue.setText("0");
-                    playerText = "Bienvenid@ a BlackJack!";
-                    PlayerHistorial.setText(playerText);
-                    endRound = false;
-                } else {
-                    System.exit(0);
-                }
-            }
-        } else {
-            playerText += "\n" + "Apuesta de nuevo!";
-            PlayerHistorial.setText(playerText);
+        }else if(roundStarts){
+            JOptionPane.showMessageDialog(this, "Inicia una Mano!");
+        }else if(endRound){
+            JOptionPane.showMessageDialog(this, "Espera que la Mano acabe!");
         }
     }//GEN-LAST:event_StandActionPerformed
 
     private void ApostarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ApostarActionPerformed
-        System.out.println("dimensiones: " + this.getWidth() + "x" + this.getHeight());
+        roundStarts = false;
+        endRound = false;
         DealerValue.setText("0");
         playerText = "";
         PlayerHistorial.setText(playerText);
         boolean noError = true;
+        
+        //Comprueba si la apuesta es valida
         playerBet = 0;
         try {
             playerBet = Integer.parseInt(Apuesta.getText());
@@ -564,18 +579,18 @@ public class Visual extends javax.swing.JFrame {
         }
 
         if (playerBet <= playerMoney && playerBet > 0 && noError) {
-            playerText += "\n" + "Repartiendo...";
+            playerText += "Repartiendo...";
             PlayerHistorial.setText(playerText);
 
-            //Player gets two cards
+            //El jugador toma 2 cartas
             playerCards.draw(playingDeck);
             playerCards.draw(playingDeck);
 
-            //Dealer gets two cards
+            //El repartidor toma 2 cartas
             dealerCards.draw(playingDeck);
             dealerCards.draw(playingDeck);
 
-            //set some cards in JFrame
+            //las 4 cartas son dibujadas en GUI
             drawCards(playerCards.getCard(0).toString(), PlayerCard1);
             drawCards(playerCards.getCard(1).toString(), PlayerCard2);
 
@@ -585,17 +600,15 @@ public class Visual extends javax.swing.JFrame {
             playerText += "\n" + "Tus Cartas:" + playerCards.toString();
             PlayerHistorial.setText(playerText);
 
-            //Display Value
+            //muestra el valor de la mano del jugador
             playerText += "\n" + "El valor de tu mano es de: " + playerCards.cardsValue();
             PlayerHistorial.setText(playerText);
             PlayerValue.setText("" + playerCards.cardsValue());
 
-            //Display dealer cards
+            //muestra el valor de la mano del repartidor
             playerText += "\n" + "Cartas del Repartidos: " + dealerCards.getCard(0).toString() + " y [Oculta]";
             PlayerHistorial.setText(playerText);
 
-            //playerText += "\n" + "Pide otra carta [Hint] o quedate [Stand]";
-            //PlayerHistorial.setText(playerText);
             JOptionPane.showMessageDialog(this, "Pide otra carta o quedate");
 
         } else if (playerBet > playerMoney && noError) {
@@ -604,7 +617,7 @@ public class Visual extends javax.swing.JFrame {
     }//GEN-LAST:event_ApostarActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        
+
     }//GEN-LAST:event_formWindowClosed
 
     private void PlayerValueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PlayerValueActionPerformed
@@ -656,6 +669,7 @@ public class Visual extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Apostar;
     private javax.swing.JTextField Apuesta;
+    private javax.swing.JLabel Author;
     private javax.swing.JLabel Capital;
     private javax.swing.JButton DealerCard1;
     private javax.swing.JButton DealerCard2;
@@ -665,6 +679,7 @@ public class Visual extends javax.swing.JFrame {
     private javax.swing.JLabel Fondo2;
     private javax.swing.JPanel Game;
     private javax.swing.JButton Hint;
+    private javax.swing.JLabel Logo;
     private javax.swing.JButton PlayerCard1;
     private javax.swing.JButton PlayerCard2;
     private javax.swing.JTextArea PlayerHistorial;

@@ -38,110 +38,104 @@ public class Deck {
         }
         return ptr;
     }
-    
-    void removeCard(Nodo ptr, Card card){
+
+    void removeCard(Nodo ptr, Card card) {
         Nodo p = ptr;
         Nodo anteP = null;
         boolean evaluated = false;
-        
-        if((p.card).equals(card)){
+
+        if ((p.card).equals(card)) {
             evaluated = true;
-        }else{
+        } else {
             anteP = p;
             p = p.Link;
         }
-        
-        while(!(p.card).equals(card) && !evaluated){
+
+        while (!(p.card).equals(card) && !evaluated) {
             anteP = p;
             p = p.Link;
         }
-        
-        if(evaluated){
+
+        if (evaluated) {
             ptr = ptr.Link;
-        }else if((p.card).equals(card)){
+        } else if ((p.card).equals(card)) {
             anteP.Link = p.Link;
         }
     }
 
     private void showList() {
         Nodo p = ptr;
-        do{
+        do {
             System.out.println(p.card.toString());
             p = p.Link;
-        }while (p != ptr);
+        } while (p != ptr);
     }
 
     public Deck() {
-        //Create a new deck of playing cards
+        //Nuevo mazo
         this.cards = new ArrayList<Card>();
         ptr = null;
     }
 
-    //Add 52 playing cards to a deck
+    //Agregar las 52 cartas
     public void createFullDeck() {
-        //Generate Cards
-        //Loop Through Suits
+        //Generarlas e ir entre suit y values
         for (Suit cardSuit : Suit.values()) {
-            //Loop through Values
             for (Value cardValue : Value.values()) {
-                //Add new card to the mix
+                //Agregarlas
                 this.cards.add(new Card(cardSuit, cardValue));
                 ptr = addCard(ptr, new Card(cardSuit, cardValue));
             }
         }
-        //showList();
     }
 
-//Shuffle deck of cards
+    //Mezclarlas
     public void shuffle() {
-        //Create a new arraylist to hold the shuffled cards temporarily
+        //Una temporal para mantenerlas antes de regresarlas
         ArrayList<Card> tmpDeck = new ArrayList<Card>();
         Nodo ptrTemp = null;
-        //Randomly pick from the old deck and copy values to the new deck
+        //coger una random y agregarla al temporal
         Random random = new Random();
         int randomCardIndex = 0;
         int originalSize = this.cards.size();
         for (int i = 0; i < originalSize; i++) {
-            //gen random num according to int randomNum = rand.nextInt((max - min) + 1) + min;
             randomCardIndex = random.nextInt((this.cards.size() - 1 - 0) + 1) + 0;
-            //throw random card into new deck
+            //agregarla al mazo temporal
             tmpDeck.add(this.cards.get(randomCardIndex));
             ptrTemp = this.addCard(ptrTemp, this.cards.get(randomCardIndex));
-            //remove picked from old deck
+            //removerla de anterior
             this.cards.remove(randomCardIndex);
-            //this.removeCard(ptrTemp, this.cards.get(randomCardIndex));
         }
-        //set this.deck to our newly shuffled deck
+        //hacer que el temporal sea el mazo original
         this.cards = tmpDeck;
         ptr = ptrTemp;
-        //System.out.println("new list from suffle");
-        //showList();
     }
 
-    //Remove a card from the deck
+    //Remover una carta
     public void removeCard(int i) {
         this.cards.remove(i);
     }
-    //Get card from deck
 
+    //Obtener una del mazo
     public Card getCard(int i) {
         return this.cards.get(i);
     }
 
-    //Add card to deck
+    //Agregar una del mazo
     public void addCard(Card addCard) {
         this.cards.add(addCard);
     }
 
-    //Draw a top card from deck
+    //Tomar la primera carta del mazo
     public void draw(Deck comingFrom) {
-        //Add card to this deck from whatever deck its coming from
+        //Agregarla al mazo (mano) del jugador o repartidor
         this.cards.add(comingFrom.getCard(0));
-        //Remove the card in the deck its coming from
+        //Removerla del mazo fuente
         comingFrom.removeCard(0);
     }
 
-    //Use to print out deck
+    //Imprime las cartas en formato lista
+    @Override
     public String toString() {
         String cardListOutput = "";
         int i = 0;
@@ -154,11 +148,11 @@ public class Deck {
 
     public void moveAllToDeck(Deck moveTo) {
         int thisDeckSize = this.cards.size();
-        //put cards in moveTo deck
+        //Mover cartas de un mazo a otro
         for (int i = 0; i < thisDeckSize; i++) {
             moveTo.addCard(this.getCard(i));
         }
-        //empty out the deck
+        //vaciar mazo
         for (int i = 0; i < thisDeckSize; i++) {
             this.removeCard(0);
         }
@@ -168,13 +162,12 @@ public class Deck {
         return this.cards.size();
     }
 
-    //Calculate the value of deck
+    //Calcula el valor de un mazo
     public int cardsValue() {
         int totalValue = 0;
         int aces = 0;
-        //For every card in the deck
+        //Para cada carta en el mazo
         for (Card aCard : this.cards) {
-            //Switch of possible values
             switch (aCard.getValue()) {
                 case DOS:
                     totalValue += 2;
@@ -218,19 +211,16 @@ public class Deck {
             }
         }
 
-        //Determine the total current value with aces
-        //Aces worth 11 or 1 - if 11 would go over 21 make it worth 1
+        //Dependiendo la situacion, un AZ puede valor 1 u 11
+        //se toma la cantidad de aces y se evalua el total de la mano actual
         for (int i = 0; i < aces; i++) {
-            //If they're already at over 10 getting an ace valued at 11 would put them up to 22, so make ace worth one
+            //si supera 10 es mejor que valga 1
             if (totalValue > 10) {
                 totalValue += 1;
-            } else {
+            } else { //si es mejor a 10 mejor que valga 11
                 totalValue += 11;
             }
         }
-
-        //Return
         return totalValue;
-
     }
 }
