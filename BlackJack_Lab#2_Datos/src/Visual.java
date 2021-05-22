@@ -170,6 +170,7 @@ public class Visual extends javax.swing.JFrame {
         Capital = new javax.swing.JLabel();
         Puntajes = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
+        Historial = new javax.swing.JLabel();
         Fondo2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -312,6 +313,13 @@ public class Visual extends javax.swing.JFrame {
         });
         Game.add(jButton1);
         jButton1.setBounds(940, 520, 70, 40);
+
+        Historial.setFont(new java.awt.Font("Agency FB", 0, 24)); // NOI18N
+        Historial.setForeground(new java.awt.Color(255, 255, 255));
+        Historial.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        Historial.setText("Historial de Mano");
+        Game.add(Historial);
+        Historial.setBounds(50, 360, 140, 30);
         Game.add(Fondo2);
         Fondo2.setBounds(0, 0, 1100, 670);
 
@@ -456,6 +464,7 @@ public class Visual extends javax.swing.JFrame {
         } else if (PlayerValue.getText().equals("0")) {
             JOptionPane.showMessageDialog(this, "Comienza la mano!");
         }
+        roundStarts = false;
     }//GEN-LAST:event_HintActionPerformed
 
     private void StandActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StandActionPerformed
@@ -679,6 +688,7 @@ public class Visual extends javax.swing.JFrame {
     private javax.swing.JLabel Fondo2;
     private javax.swing.JPanel Game;
     private javax.swing.JButton Hint;
+    private javax.swing.JLabel Historial;
     private javax.swing.JLabel Logo;
     private javax.swing.JButton PlayerCard1;
     private javax.swing.JButton PlayerCard2;
